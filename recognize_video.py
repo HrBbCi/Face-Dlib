@@ -33,26 +33,28 @@ if __name__ == "__main__":
     labels = cPickle.load(open("labels.cpickle", 'rb'))
     shape_predictor = dlib.shape_predictor("models/shape_predictor_68_face_landmarks.dat")
     face_recognizer = dlib.face_recognition_model_v1("models/dlib_face_recognition_resnet_model_v1.dat")
-    # url = "https://www.youtube.com/watch?v=MOwaUlXZxkI" #GOT white walker Intro
-
-    #    url = "https://www.youtube.com/watch?v=aB_UvmPqXTg"
-    #    url = "https://www.youtube.com/watch?v=81Uz1mF09O4" #GOT Jamie and Cersei Lannister
     #     url = "https://www.youtube.com/watch?v=pFk2t3E2aWE"
     url = 'videos/a.mp4'  # GOT white walker Intro
-    #url = "https://www.youtube.com/watch?v=9QbltzIUV6w" # Avengers
-    # url = "https://www.youtube.com/watch?v=jOJbXvjZ-cQ" # GOT white walker Intro
     # videoPafy = pf.new(url)
     # best = videoPafy.getbest(preftype="webm")
     # print (videoPafy.title)
     input_video = cv2.VideoCapture(url)
-
+    output_video = "videos/ab.avi"
+    video_writer = cv2.VideoWriter(output_video, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 25,
+                                   (int(input_video.get(cv2.CAP_PROP_FRAME_WIDTH)), int(input_video.get(cv2.CAP_PROP_FRAME_HEIGHT))))
     fps = input_video.get(cv2.CAP_PROP_FPS)
     #    multiplier = fps * 1
     try:
         while input_video.isOpened():
+
             frameId = int(round(input_video.get(1)))
             ret, image = input_video.read()
-            image = rescale_frame(image, percent=75)
+            if not ret:
+                print("Done processing !!!")
+                print("Output file is stored as ", output_video)
+                cv2.waitKey(3000)
+                break
+            # image = rescale_frame(image, percent=75)
             image_original = image
 
             #            if (frameId % math.floor(multiplier) == 0):
@@ -67,6 +69,7 @@ if __name__ == "__main__":
                 cv2.putText(image_original, label[0], (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 0.6, (255, 255, 0), 1)
 
             #            cv2.imshow("Image", image)
+            video_writer.write(image_original.astype(np.uint8))
             cv2.imshow("Face Recognition using Dlib", image_original)
             if not ret:
                 break
